@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -16,6 +17,18 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
+
+function verifyJWT(req, res, next) {
+  jwt.sign(
+    { foo: "bar" },
+    process.env.ACCESS_TOKEN,
+    { algorithm: "RS256" },
+    function (err, token) {
+      console.log(token);
+    }
+  );
+}
+verifyJWT();
 
 async function run() {
   try {
