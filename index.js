@@ -21,6 +21,12 @@ async function run() {
   try {
     await client.connect();
     const partCollection = client.db("mars_technology").collection("parts");
+
+    // GET
+    app.get("/parts", async (req, res) => {
+      const parts = await partCollection.find({}).toArray();
+      res.send(parts);
+    });
   } finally {
   }
 }
