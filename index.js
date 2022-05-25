@@ -49,6 +49,12 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/myOrder/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await orderCollection.find({ email: email }).toArray();
+      res.send(result);
+    });
+
     // POST
     app.post("/order", async (req, res) => {
       const order = req.body;
