@@ -61,6 +61,13 @@ async function run() {
       const result = await orderCollection.insertOne(order);
       res.send(result);
     });
+
+    // DELETE
+    app.delete("/myOrder/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await orderCollection.deleteOne({ _id: ObjectId(id) });
+      res.send(result);
+    });
   } finally {
   }
 }
