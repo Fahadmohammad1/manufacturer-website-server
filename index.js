@@ -52,10 +52,7 @@ async function run() {
     // POST
     app.post("/order", async (req, res) => {
       const order = req.body;
-      const doc = {
-        order: order,
-      };
-      const result = await orderCollection.insertOne(doc);
+      const result = await orderCollection.insertOne(order);
       res.send(result);
     });
   } finally {
