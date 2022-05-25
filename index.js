@@ -34,6 +34,7 @@ async function run() {
   try {
     await client.connect();
     const partCollection = client.db("mars_technology").collection("parts");
+    const orderCollection = client.db("mars_technology").collection("orders");
 
     // GET
     app.get("/parts", async (req, res) => {
@@ -45,6 +46,16 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await partCollection.findOne(query);
+      res.send(result);
+    });
+
+    // POST
+    app.post("/order", async (req, res) => {
+      const order = req.body;
+      const doc = {
+        order: order,
+      };
+      const result = await orderCollection.insertOne(doc);
       res.send(result);
     });
   } finally {
