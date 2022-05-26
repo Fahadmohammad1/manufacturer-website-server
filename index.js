@@ -35,8 +35,9 @@ async function run() {
     await client.connect();
     const partCollection = client.db("mars_technology").collection("parts");
     const orderCollection = client.db("mars_technology").collection("orders");
+    const userCollection = client.db("mars_technology").collection("users");
 
-    // GET
+    //===================== GET ======================
     app.get("/parts", async (req, res) => {
       const parts = await partCollection.find({}).toArray();
       res.send(parts);
@@ -55,20 +56,26 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/myOrder/:id", async (req, res) => {
+    app.get("/myOrder/order/:id", async (req, res) => {
       const id = req.params.id;
       const order = await orderCollection.findOne({ _id: ObjectId(id) });
       res.send(order);
     });
 
-    // POST
+    //============== POST ======================
     app.post("/order", async (req, res) => {
       const order = req.body;
       const result = await orderCollection.insertOne(order);
       res.send(result);
     });
 
-    // DELETE
+    app.post("/user", async (req, res) => {
+      const userInfo = req.body;
+      const user = await userCollection.insertOne(userInfo);
+      res.send(user);
+    });
+
+    //=============== DELETE ====================
     app.delete("/myOrder/:id", async (req, res) => {
       const id = req.params.id;
       const result = await orderCollection.deleteOne({ _id: ObjectId(id) });
