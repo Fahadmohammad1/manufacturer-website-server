@@ -69,16 +69,25 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/user", async (req, res) => {
-      const userInfo = req.body;
-      const user = await userCollection.insertOne(userInfo);
-      res.send(user);
-    });
-
     //=============== DELETE ====================
     app.delete("/myOrder/:id", async (req, res) => {
       const id = req.params.id;
       const result = await orderCollection.deleteOne({ _id: ObjectId(id) });
+      res.send(result);
+    });
+
+    //=============== PUT ========================
+
+    app.put("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const options = { upsert: true };
+      const filter = { email: email };
+      const updateDoc = {
+        $set: user,
+      };
+      console.log(updateDoc);
+      const result = await userCollection.updateOne(filter, updateDoc, options);
       res.send(result);
     });
   } finally {
