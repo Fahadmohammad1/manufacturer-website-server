@@ -62,6 +62,13 @@ async function run() {
       res.send(order);
     });
 
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const user = await userCollection.findOne({ email: email });
+      res.send(user);
+    });
+
     //============== POST ======================
     app.post("/order", async (req, res) => {
       const order = req.body;
@@ -86,7 +93,6 @@ async function run() {
       const updateDoc = {
         $set: user,
       };
-      console.log(updateDoc);
       const result = await userCollection.updateOne(filter, updateDoc, options);
       res.send(result);
     });
