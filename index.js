@@ -36,6 +36,7 @@ async function run() {
     const partCollection = client.db("mars_technology").collection("parts");
     const orderCollection = client.db("mars_technology").collection("orders");
     const userCollection = client.db("mars_technology").collection("users");
+    const reviewCollection = client.db("mars_technology").collection("reviews");
 
     //===================== GET ======================
     app.get("/parts", async (req, res) => {
@@ -94,6 +95,22 @@ async function run() {
         $set: user,
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    });
+
+    app.put("/review/:email", async (req, res) => {
+      const email = req.params.email;
+      const review = req.body;
+      const options = { upsert: true };
+      const filter = { email: email };
+      const updateReview = {
+        $set: review,
+      };
+      const result = await reviewCollection.updateOne(
+        filter,
+        updateReview,
+        options
+      );
       res.send(result);
     });
   } finally {
