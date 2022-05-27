@@ -2,10 +2,10 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-const port = process.env.PORT || 5000;
 const jwt = require("jsonwebtoken");
 
 const app = express();
+const port = process.env.PORT || 5000;
 
 // middleware
 app.use(cors());
@@ -20,12 +20,15 @@ const client = new MongoClient(uri, {
 
 function verifyJWT(req, res, next) {
   const authHeader = req.headers.authorization;
+
   if (!authHeader) {
     return res.status(401).send({ message: "UnAuthorized access" });
   }
   const token = authHeader.split(" ")[1];
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+
+  jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
     if (err) {
+      console.log(err);
       return res.status(403).send({ message: "Forbidden access" });
     }
     req.decoded = decoded;
@@ -54,10 +57,16 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/myOrder/:email", async (req, res) => {
+    app.get("/myOrder/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
-      const result = await orderCollection.find({ email: email }).toArray();
-      res.send(result);
+      const decodedEmail = req.decoded.email;
+      console.log(decodedEmail);
+      if (email === decodedEmail) {
+        const result = await orderCollection.find({ email: email }).toArray();
+        return res.send(result);
+      } else {
+        return res.status(403).send({ message: "forbidden access" });
+      }
     });
 
     app.get("/myOrder/order/:id", async (req, res) => {
@@ -98,11 +107,9 @@ async function run() {
         $set: user,
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
-      const token = jwt.sign(
-        { email: email },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "1h" }
-      );
+      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, {
+        expiresIn: "1h",
+      });
       res.send({ result, token });
     });
 
