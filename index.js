@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -43,6 +44,9 @@ async function run() {
     const orderCollection = client.db("mars_technology").collection("orders");
     const userCollection = client.db("mars_technology").collection("users");
     const reviewCollection = client.db("mars_technology").collection("reviews");
+    const paymentCollection = client
+      .db("mars_technology")
+      .collection("payments");
 
     const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
@@ -55,6 +59,18 @@ async function run() {
         res.status(403).send({ message: "forbidden" });
       }
     };
+
+    app.post("/create-payment-intent", verifyJWT, async (req, res) => {
+      const part = req.body;
+      const price = part.price;
+      const amount = price * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+      res.send({ clientSecret: paymentIntent.client_secret });
+    });
 
     //===================== GET ======================
     app.get("/parts", async (req, res) => {
@@ -166,6 +182,22 @@ async function run() {
         updateReview,
         options
       );
+      res.send(result);
+    });
+
+    // ================== PATCH ===================
+    app.patch("/order/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const payment = req.body;
+      const filter = { _id: ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          paid: true,
+          transactionId: payment.transactionId,
+        },
+      };
+      const allpayment = await paymentCollection.insertOne(payment);
+      const result = await orderCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
   } finally {
