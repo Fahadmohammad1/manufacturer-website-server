@@ -109,7 +109,7 @@ async function run() {
 
     app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email);
+
       const user = await userCollection.findOne({ email: email });
       res.send(user);
     });
@@ -119,6 +119,11 @@ async function run() {
       const user = await userCollection.findOne({ email: email });
       const isAdmin = user.role === "admin";
       res.send({ admin: isAdmin });
+    });
+
+    app.get("/review", async (req, res) => {
+      const reviews = await reviewCollection.find({}).toArray();
+      res.send(reviews);
     });
 
     //============== POST ======================
