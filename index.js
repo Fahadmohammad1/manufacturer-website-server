@@ -9,10 +9,10 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // middleware
-app.use(cors());
+app.use(cors({ origin: "https://mars-technology-630b3.web.app" }));
 app.use(express.json());
 
-const uri = `mongodb+srv://marsUser:IygYwT2DukLrDewy@cluster0.ejds7.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://marsUser:${process.env.DB_PASS}@cluster0.ejds7.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -77,6 +77,7 @@ async function run() {
     //===================== GET ======================
     app.get("/parts", async (req, res) => {
       const parts = await partCollection.find({}).toArray();
+
       res.send(parts);
     });
 
