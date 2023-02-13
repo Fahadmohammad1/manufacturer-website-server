@@ -12,7 +12,8 @@ const port = process.env.PORT || 5000;
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-const uri = `mongodb+srv://marsUser:IygYwT2DukLrDewy@cluster0.ejds7.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ejds7.mongodb.net/?retryWrites=true&w=majority`;
+
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -36,8 +37,6 @@ function verifyJWT(req, res, next) {
     next();
   });
 }
-
-//this comment is for testing
 
 async function run() {
   try {
