@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // middleware
-app.use(cors({ origin: "*" }));
+app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ejds7.mongodb.net/?retryWrites=true&w=majority`;
@@ -40,7 +40,7 @@ function verifyJWT(req, res, next) {
 
 async function run() {
   try {
-    await client.connect();
+    client.connect();
     const partCollection = client.db("mars_technology").collection("parts");
     const orderCollection = client.db("mars_technology").collection("orders");
     const userCollection = client.db("mars_technology").collection("users");
